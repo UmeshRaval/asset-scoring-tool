@@ -1,0 +1,26 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  max-width: 1000px;
+  margin: auto;
+}
+
+label {
+  display: inline-block;
+  width: 140px;
+}
+
+input, select {
+  margin-bottom: 10px;
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+.chart-wrapper {
+  width: 100%;             /* 100% of parent container */
+  height: 500px;           /* Increased height for clarity */
+  margin-top: 20px;
+  position: relative;
+}
