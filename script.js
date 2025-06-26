@@ -97,8 +97,8 @@ function generateAges(dist = "normal", count = 1000) {
 
 function generateAndPlot() {
   const dist = document.getElementById("distribution").value;
-  const model = document.getElementById("model").value;
-  const baseline = parseFloat(document.getElementById("baseline").value) || 0;
+  const model = document.getElementById("plotModel").value;
+  const baseline = parseFloat(document.getElementById("plotBaseline").value) || 0;
   const ages = generateAges(dist);
   const scores = ages.map(age => computeAgeScore(age, {
     model: model,
@@ -137,6 +137,8 @@ function generateAndPlot() {
   });
 }
 function calculateScore() {
+  console.log("Model selected:", document.getElementById("model").value);
+  console.log("Granularity selected:", document.getElementById("granularity").value);
   const installed = new Date(document.getElementById("installedDate").value);
   const current = new Date(document.getElementById("currentDate").value);
   const granularity = document.getElementById("granularity").value;
