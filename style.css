@@ -19,8 +19,23 @@ input, select {
 }
 
 .chart-wrapper {
-  width: 100%;             /* 100% of parent container */
-  height: 500px;           /* Increased height for clarity */
-  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+  flex-wrap: wrap;
+  margin: 30px auto;
+  max-width: 1000px;
+}
+
+.chart-container {
+  width: 480px;
+  height: 400px;
   position: relative;
+}
+
+canvas {
+  width: 100% !important;
+  height: 100% !important;
+  display: block;
 }

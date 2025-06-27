@@ -94,29 +94,50 @@ function generateAges(dist = "normal", count = 1000) {
   }
   return ages;
 }
+function computeHistogramBins(data, binCount = 10) {
+  const min = Math.min(...data);
+  const max = Math.max(...data);
+  const binSize = (max - min) / binCount;
+  const bins = Array(binCount).fill(0);
+  const labels = [];
 
+  for (let i = 0; i < binCount; i++) {
+    labels.push(`${(min + i * binSize).toFixed(1)}–${(min + (i + 1) * binSize).toFixed(1)}`);
+  }
+
+  data.forEach(age => {
+    let binIndex = Math.floor((age - min) / binSize);
+    if (binIndex >= binCount) binIndex = binCount - 1;
+    bins[binIndex]++;
+  });
+
+  return { labels, bins };
+}
 function generateAndPlot() {
   const dist = document.getElementById("distribution").value;
   const model = document.getElementById("plotModel").value;
   const baseline = parseFloat(document.getElementById("plotBaseline").value) || 0;
+
   const ages = generateAges(dist);
-  const scores = ages.map(age => computeAgeScore(age, {
-    model: model,
-    baseline: baseline,
-    k: 0.15,
-    slope: 5,
-    sigmoidParams: { growthRate: 1, midAge: 5, maxScore: 100 },
-    piecewiseTiers: [
-      { maxAge: 2, score: 90 },
-      { maxAge: 5, score: 70 },
-      { maxAge: 8, score: 50 },
-      { maxAge: Infinity, score: baseline }
-    ]
-  }));
+  const scores = ages.map(age =>
+    computeAgeScore(age, {
+      model: model,
+      baseline: baseline,
+      k: 0.15,
+      slope: 5,
+      sigmoidParams: { growthRate: 1, midAge: 5, maxScore: 100 },
+      piecewiseTiers: [
+        { maxAge: 2, score: 90 },
+        { maxAge: 5, score: 70 },
+        { maxAge: 8, score: 50 },
+        { maxAge: Infinity, score: baseline }
+      ]
+    })
+  );
 
-  const ctx = document.getElementById("scoreChart").getContext("2d");
+  // Destroy previous scatter chart if exists
   if (window.assetChart) window.assetChart.destroy();
-
+  const ctx = document.getElementById("scoreChart").getContext("2d");
   window.assetChart = new Chart(ctx, {
     type: "scatter",
     data: {
@@ -132,6 +153,30 @@ function generateAndPlot() {
       scales: {
         x: { title: { display: true, text: "Asset Age (Years)" }, min: 0, max: 10 },
         y: { title: { display: true, text: "Asset Score" }, min: 0, max: 100 }
+      }
+    }
+  });
+
+  const hist = computeHistogramBins(ages, 10);
+  const histCtx = document.getElementById("ageHistogram").getContext("2d");
+  if (window.histChart) window.histChart.destroy();
+
+  window.histChart = new Chart(histCtx, {
+    type: "bar",
+    data: {
+      labels: hist.labels,
+      datasets: [{
+        label: "Age Distribution",
+        data: hist.bins,
+        backgroundColor: "rgba(255, 159, 64, 0.7)"
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      scales: {
+        x: { title: { display: true, text: "Age Ranges (Years)" } },
+        y: { title: { display: true, text: "Asset Count" }, beginAtZero: true }
       }
     }
   });
