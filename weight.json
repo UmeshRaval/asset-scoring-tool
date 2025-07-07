@@ -1,0 +1,108 @@
+{
+  "asset_type": "boiler",
+  "baseline_score": 30,
+  "granularity": "years",
+  "decay_formula": "100 / (1 + Math.exp(k * (age - 5)))", 
+
+  "decay_params": {
+    "k": 1
+  },
+
+   "events": {
+    "low_water_pressure_alert": {
+      "conditions": [
+        {
+          "metric": "water_pressure_bar",
+          "op": "lt",
+          "value": 2,
+          "action": {
+            "apply": "add_constant",
+            "logic": "totalScore + score",
+            "score": -5
+          }
+        }
+      ],
+      "operators": {
+        "lt": {
+          "logic": "value < rule.value"
+        }
+      }
+    },
+    "inspect_valves": {
+      "conditions": [
+        {
+          "metric": "inspection_time_minutes",
+          "op": "gt",
+          "value": 20,
+          "action": {
+            "apply": "add_constant",
+            "logic": "totalScore + score",
+            "score": 2
+          }
+        }
+      ],
+      "operators": {
+        "gt": {
+          "logic": "value > rule.value"
+        }
+      }
+    },
+    "check_oil_level": {
+      "conditions": [
+        {
+          "metric": "oil_level_percent",
+          "op": "lt",
+          "value": 50,
+          "action": {
+            "apply": "add_constant",
+            "logic": "totalScore + score",
+            "score": -3
+          }
+        }
+      ],
+      "operators": {
+        "lt": {
+          "logic": "value < rule.value"
+        }
+      }
+    },
+    "temperature_alert": {
+      "conditions": [
+        {
+          "metric": "temperature_celsius",
+          "op": "gte",
+          "value": 100,
+          "action": {
+            "apply": "multiply_input",
+            "logic": "totalScore + value * factor",
+            "factor": 0.1
+          }
+        }
+      ],
+      "operators": {
+        "gte": {
+          "logic": "value >= rule.value"
+        }
+      }
+    },
+    "relay_check": {
+      "conditions": [
+        {
+          "metric": "contact_resistance_ohms",
+          "op": "gt",
+          "value": 1,
+          "action": {
+            "apply": "subtract_input",
+            "logic": "totalScore - value * factor",
+            "factor": 0.5
+          }
+        }
+      ],
+      "operators": {
+        "gt": {
+          "logic": "value > rule.value"
+        }
+      }
+    }
+  }
+}
